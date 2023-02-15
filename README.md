@@ -21,7 +21,7 @@ pip3 install -r requirements.txt
 ## Overview
 **Edgeformers** contain two transformer-based architecture, namely **Edgeformer-E** and **Edgeformer-N**, for edge representation learning and node representation learning respectively.
 
-<img src="./Edgeformers.png" width="1000px"></img>
+<embed src="Edgeformers.pdf" type="application/pdf">
 
 
 ## Edge Representation Learning
@@ -44,7 +44,7 @@ Get this game!  Beautiful graphics, entertaining story.  Challenging yet not uns
 (1) The network config file ```node_num.pkl```. (2) Model training and testing files ```train.tsv, val.tsv, test.tsv```. Please refer to the file in our processed dataset for their format.
 
 ### Running
-**Train.**
+**Train**
 ```
 cd Edgeformer-E
 CUDA_VISIBLE_DEVICES=0 python main.py --data_path $data_path --data_mode bert --model_type EdgeformerE
@@ -52,7 +52,7 @@ CUDA_VISIBLE_DEVICES=0 python main.py --data_path $data_path --data_mode bert --
 The dataset path is $data_path and the model checkpoints will be saved in $data_path/ckpt. Since tokenizing will cost a lot of time, for the first run on a new dataset, the cached tokenized data files will be saved in $data_path for future use. You may change the hyperparameters for your own preference.
 
 
-**Test.**
+**Test**
 ```
 cd Edgeformer-E
 CUDA_VISIBLE_DEVICES=0 python main.py --data_path $data_path --data_mode bert --model_type EdgeformerE --mode test --load_ckpt_name $load_ckpt
@@ -80,7 +80,7 @@ We will utilize node pairs with label 1 to train the model.
 
 
 ### Running
-**Train.**
+**Train**
 ```
 cd Edgeformer-N
 CUDA_VISIBLE_DEVICES=0 python main.py --data_path $data_path --data_mode text --model_type EdgeformerN
@@ -88,14 +88,14 @@ CUDA_VISIBLE_DEVICES=0 python main.py --data_path $data_path --data_mode text --
 The dataset path is $data_path and the model checkpoints will be saved in $data_path/ckpt. Since tokenizing will cost a lot of time, for the first run on a new dataset, the cached tokenized data files will be saved in $data_path for future use. You may change the hyperparameters for your own preference.
 
 
-**Test.**
+**Test**
 ```
 cd Edgeformer-N
 CUDA_VISIBLE_DEVICES=0 python main.py --data_path $data_path --data_mode text --model_type EdgeformerN --mode test --load_ckpt_name $load_ckpt
 ```
 The dataset path is $data_path. $load_ckpt refers to the checkpoint file you want to test. MRR and NDCG scores will be shown in the last several lines of the output.
 
-**Infer.**
+**Infer**
 ```
 cd Edgeformer-N
 CUDA_VISIBLE_DEVICES=0 python main.py --data_path $data_path --data_mode text --model_type EdgeformerN --mode infer --load True --load_ckpt_name $load_ckpt
