@@ -4,14 +4,14 @@ import argparse
 from pathlib import Path
 import torch.multiprocessing as mp
 
-from src.run import train, test, infer
+from src.run import train, test
 from src.utils import setuplogging, str2bool, set_seed
 
 parser = argparse.ArgumentParser(description='Study for Edge Text-Rich Networks.')
-parser.add_argument("--mode", type=str, default="train", choices=['train', 'test', 'infer'])
-parser.add_argument("--data_path", type=str, default="Yelp/debug", choices=['Apps/', 'Apps/debug'])
+parser.add_argument("--mode", type=str, default="train", choices=['train', 'test'])
+parser.add_argument("--data_path", type=str, default="Apps/", choices=['Apps/', 'movie/', 'children/', 'crime_book/'])
 # parser.add_argument("--model_dir", type=str, default='ckpt/', choices=['ckpt/', 'ckpt-test/'])  # path to save
-parser.add_argument("--data_mode", default="text", type=str, choices=['bert'])
+parser.add_argument("--data_mode", default="bert", type=str, choices=['bert'])
 parser.add_argument("--pretrain_embed", type=str2bool, default=False) # use pretrain node embedding or not
 parser.add_argument("--pretrain_dir", default="movie/pretrain", type=str, choices=['movie/pretrain']) # pretrain node embedding dir
 parser.add_argument("--pretrain_mode", default="MF", type=str, choices=['MF','BERTMF']) # pretrain node embedding dir
@@ -20,9 +20,7 @@ parser.add_argument("--pretrain_mode", default="MF", type=str, choices=['MF','BE
 parser.add_argument("--model_type", default="EdgeformerE", type=str, choices=['EdgeformerE'])
 parser.add_argument("--pretrain_LM", type=str2bool, default=True)
 parser.add_argument("--heter_embed_size", type=int, default=64)
-parser.add_argument("--attr_max_features", type=int, default=2000)
-# parser.add_argument("--attr_embed_size", type=int, default=768)
-# parser.add_argument("--attr_vec", type=str, default='tfidf', choices=['cnt', 'tfidf'])
+# parser.add_argument("--attr_max_features", type=int, default=2000)
 
 # some parameters fixed depend on dataset
 parser.add_argument("--max_length", type=int, default=64) # this parameter should be the same for all models for one particular dataset
@@ -52,7 +50,6 @@ parser.add_argument("--model_name_or_path", default="bert-base-uncased", type=st
 parser.add_argument(
         "--load_ckpt_name",
         type=str,
-        default='ckpt/GraphformerAbl-text-True-1e-05-64-768-cnt-epoch-27.pt',
         help="choose which ckpt to load and test"
     )
 
@@ -62,17 +59,13 @@ parser.add_argument("--fp16", type=str2bool, default=True)
 args = parser.parse_args()
 
 # pretrain dir
-if args.data_path in ['Apps/', 'Apps/debug']:
-    args.pretrain_dir = 'Apps/pretrain'
-else:
-    raise ValueError('stop')
+# if args.data_path in ['Apps/', 'Apps/debug']:
+#     args.pretrain_dir = 'Apps/pretrain'
+# else:
+#     raise ValueError('stop')
 
 # model data mode
-if args.model_type in ['EdgeformerE']:
-    assert args.data_mode == 'bert'
-else:
-    raise ValueError('Wrong Data Mode!')
-
+assert args.data_mode == 'bert'
 
 if args.local_rank in [-1,0]:
     logging.info(args)
@@ -98,9 +91,3 @@ if __name__ == "__main__":
         ################## You should use single GPU for testing. ####################
         assert args.local_rank == -1
         test(args)
-
-    if args.mode == 'infer':
-        print('-------------infer--------------')
-        ################## You should use single GPU for infering. ####################
-        assert args.local_rank == -1
-        infer(args)

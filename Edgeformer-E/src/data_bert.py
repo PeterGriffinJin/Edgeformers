@@ -12,8 +12,6 @@ import torch
 from torch.utils.data.dataset import Dataset, TensorDataset
 from transformers import BertTokenizer, BertTokenizerFast
 
-from IPython import embed
-
 logger = logging.getLogger(__name__)
 
 

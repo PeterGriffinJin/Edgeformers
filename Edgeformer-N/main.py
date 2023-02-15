@@ -9,7 +9,7 @@ from src.utils import setuplogging, str2bool, set_seed
 
 parser = argparse.ArgumentParser(description='Study for Edge Text-Rich Networks.')
 parser.add_argument("--mode", type=str, default="train", choices=['train', 'test', 'infer'])
-parser.add_argument("--data_path", type=str, default="movie/", choices=['movie/'])
+parser.add_argument("--data_path", type=str, default="movie/", choices=['movie/', 'Apps/', 'children/', 'crime_book/', 'stackoverflow/'])
 # parser.add_argument("--model_dir", type=str, default='ckpt/', choices=['ckpt/', 'ckpt-test/'])  # path to save
 parser.add_argument("--data_mode", default="text", type=str, choices=['text'])
 parser.add_argument("--pretrain_embed", type=str2bool, default=False) # use pretrain node embedding or not
@@ -20,9 +20,6 @@ parser.add_argument("--pretrain_mode", default="MF", type=str, choices=['MF','BE
 parser.add_argument("--model_type", default="EdgeformerN", type=str, choices=['EdgeformerN'])
 parser.add_argument("--pretrain_LM", type=str2bool, default=True)
 parser.add_argument("--heter_embed_size", type=int, default=64)
-parser.add_argument("--attr_max_features", type=int, default=2000)
-# parser.add_argument("--attr_embed_size", type=int, default=768)
-# parser.add_argument("--attr_vec", type=str, default='tfidf', choices=['cnt', 'tfidf'])
 
 # some parameters fixed depend on dataset
 parser.add_argument("--max_length", type=int, default=64) # this parameter should be the same for all models for one particular dataset
@@ -52,7 +49,6 @@ parser.add_argument("--model_name_or_path", default="bert-base-uncased", type=st
 parser.add_argument(
         "--load_ckpt_name",
         type=str,
-        default='ckpt/GraphformerAbl-text-True-1e-05-64-768-cnt-epoch-27.pt',
         help="choose which ckpt to load and test"
     )
 
@@ -61,11 +57,11 @@ parser.add_argument("--fp16", type=str2bool, default=True)
 
 args = parser.parse_args()
 
-# pretrain dir
-if args.data_path in ['movie/', 'movie/debug']:
-    args.pretrain_dir = 'movie/pretrain'
-else:
-    raise ValueError('stop')
+# # pretrain dir
+# if args.data_path in ['movie/', 'movie/debug']:
+#     args.pretrain_dir = 'movie/pretrain'
+# else:
+#     raise ValueError('stop')
 
 # model data mode
 if args.model_type in ['EdgeformerN']:

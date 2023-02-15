@@ -6,11 +6,6 @@
 CUDA_VISIBLE_DEVICES=1 python main.py
 ```
 
-#### Multi-GPU
-```
-CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node 4 main.py
-```
-
 ### Train & Test Edgeformer-E
 ```
 CUDA_VISIBLE_DEVICES=0 python main.py --data_path $data_path --data_mode bert --model_type EdgeformerE --train_batch_size 25 --max_length 256
@@ -20,6 +15,5 @@ CUDA_VISIBLE_DEVICES=0 python main.py --data_path $data_path --data_mode bert --
 
 Remember to change args.load_ckpt_name in main.py
 ```
-python main.py --mode test
+CUDA_VISIBLE_DEVICES=1 python main.py --data_path Apps/debug --data_mode bert --model_type EdgeformerE --max_length 256 --mode test --load_ckpt_name Apps/debug/ckpt/EdgeformerE-True-1e-05-64-best.pt
 ```
-

@@ -12,8 +12,6 @@ import torch
 from torch.utils.data.dataset import Dataset, TensorDataset
 from transformers import BertTokenizer, BertTokenizerFast
 
-from IPython import embed
-
 logger = logging.getLogger(__name__)
 
 
@@ -79,9 +77,6 @@ def load_dataset_text(args, tokenizer, evaluate=False, test=False):
     assert attention_query_edges.shape[1] == args.user_pos_neighbour + args.user_neg_neighbour
     assert query_neighbor_ids.shape[1] == args.user_pos_neighbour + args.user_neg_neighbour
     assert query_neighbor_mask.shape[1] == args.user_pos_neighbour + args.user_neg_neighbour
-
-    # embed()
-    # raise ValueError('stop')
 
     ################################### Be Careful about the Reindex Here. ###################################
     pos_index = (edge_labels == 1)

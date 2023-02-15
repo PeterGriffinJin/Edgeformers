@@ -20,8 +20,6 @@ from transformers import BertConfig, BertTokenizerFast, AdamW, get_linear_schedu
 
 from transformers import BertModel
 
-from IPython import embed
-
 def cleanup():
     dist.destroy_process_group()
 
@@ -32,8 +30,8 @@ def load_bert(args):
     config.node_num = args.user_num + args.item_num
 
     if args.model_type == 'EdgeformerN':
-        from src.model.EdgeformerTC import EdgeFormersTCForNeighborPredict
-        model = EdgeFormersTCForNeighborPredict.from_pretrained(args.model_name_or_path, config=config) if args.pretrain_LM else EdgeFormersTCForNeighborPredict(config)
+        from src.model.EdgeformerN import EdgeFormersForNeighborPredict
+        model = EdgeFormersForNeighborPredict.from_pretrained(args.model_name_or_path, config=config) if args.pretrain_LM else EdgeFormersForNeighborPredict(config)
         model.node_num, model.edge_type, model.heter_embed_size = args.user_num + args.item_num, args.edge_type, args.heter_embed_size
         model.init_node_embed(args.pretrain_embed, args.pretrain_mode, args.pretrain_dir)
     else:
@@ -154,7 +152,7 @@ def train(args):
 
         ## start validating
         if args.local_rank in [-1, 0]:
-            ckpt_path = os.path.join(args.data_path, 'ckpt', '{}-{}-{}-{}-{}-{}-{}-epoch-{}.pt'.format(args.model_type, args.data_mode, args.pretrain_LM, args.lr, args.heter_embed_size, args.pretrain_embed, args.pretrain_mode, ep + 1))
+            ckpt_path = os.path.join(args.data_path, 'ckpt', '{}-{}-{}-{}-epoch-{}.pt'.format(args.model_type, args.data_mode, args.lr, args.heter_embed_size, ep + 1))
             torch.save(model.state_dict(), ckpt_path)
             logging.info(f"Model saved to {ckpt_path}")
 
@@ -162,7 +160,7 @@ def train(args):
             acc = validate(args, model, val_loader)
             logging.info("validation time:{}".format(time() - start_time))
             if acc > best_acc:
-                ckpt_path = os.path.join(args.data_path, 'ckpt', '{}-{}-{}-{}-{}-{}-{}-best.pt'.format(args.model_type, args.data_mode, args.pretrain_LM, args.lr, args.heter_embed_size, args.pretrain_embed, args.pretrain_mode))
+                ckpt_path = os.path.join(args.data_path, 'ckpt', '{}-{}-{}-{}-best.pt'.format(args.model_type, args.data_mode, args.lr, args.heter_embed_size))
                 torch.save(model.state_dict(), ckpt_path)
                 logging.info(f"Model saved to {ckpt_path}")
                 best_acc = acc
@@ -171,7 +169,7 @@ def train(args):
                 best_count += 1
                 if best_count >= args.early_stop:
                     start_time = time()
-                    ckpt_path = os.path.join(args.data_path, 'ckpt', '{}-{}-{}-{}-{}-{}-{}-best.pt'.format(args.model_type, args.data_mode, args.pretrain_LM, args.lr, args.heter_embed_size, args.pretrain_embed, args.pretrain_mode))
+                    ckpt_path = os.path.join(args.data_path, 'ckpt', '{}-{}-{}-{}-best.pt'.format(args.model_type, args.data_mode, args.lr, args.heter_embed_size))
                     model.load_state_dict(torch.load(ckpt_path, map_location="cpu"))
                     logging.info("Start testing for best")
                     acc = validate(args, model, test_loader)
@@ -186,7 +184,7 @@ def train(args):
     if args.local_rank in [-1, 0]:
         start_time = time()
         # load checkpoint
-        ckpt_path = os.path.join(args.data_path, 'ckpt', '{}-{}-{}-{}-{}-{}-{}-best.pt'.format(args.model_type, args.data_mode, args.pretrain_LM, args.lr, args.heter_embed_size, args.pretrain_embed, args.pretrain_mode))
+        ckpt_path = os.path.join(args.data_path, 'ckpt', '{}-{}-{}-{}-best.pt'.format(args.model_type, args.data_mode, args.lr, args.heter_embed_size))
         model.load_state_dict(torch.load(ckpt_path, map_location="cpu"))
         logging.info('load ckpt:{}'.format(ckpt_path))
         acc = validate(args, model, test_loader)
@@ -229,8 +227,8 @@ def test(args):
     args.user_pos_neighbour, args.user_neg_neighbour, args.item_pos_neighbour, args.item_neg_neighbour = pickle.load(open(os.path.join(args.data_path,'neighbor_sampling.pkl'),'rb'))
 
     # load dataset
-    ########################## Motify collate_f & think about shuffle in Dataloader
     if args.data_mode in ['text']:
+        args.user_num, args.item_num, args.edge_type = pickle.load(open(os.path.join(args.data_path, 'node_num.pkl'),'rb'))
         test_set = load_dataset_text(args, tokenizer, evaluate=True, test=True)
     else:
         raise ValueError('Data Mode is Incorrect here!')
@@ -266,7 +264,6 @@ def infer(args):
     args.user_pos_neighbour, args.user_neg_neighbour, args.item_pos_neighbour, args.item_neg_neighbour = pickle.load(open(os.path.join(args.data_path,'neighbor_sampling.pkl'),'rb'))
 
     # load dataset
-    ########################## Motify collate_f & think about shuffle in Dataloader
     if args.data_mode in ['text']:
         args.user_num, args.item_num, args.edge_type = pickle.load(open(os.path.join(args.data_path, 'node_num.pkl'),'rb'))
         train_set = load_dataset_text(args, tokenizer, evaluate=False, test=False)
@@ -306,18 +303,14 @@ def infer(args):
         if args.enable_gpu:
             if args.data_path in ['stackoverflow/']:
                 batch = [b.cuda() for i, b in enumerate(batch) if i< (len(batch) // 2)]
-            elif args.data_path in ['movie/', 'movie/debug', 'crime_book/', 'Apps/']:
+            elif args.data_path in ['movie/', 'crime_book/', 'Apps/']:
                 batch = [b.cuda() for i, b in enumerate(batch) if i>= (len(batch) // 2)]
             else:
                 raise ValueError('Error here!')
 
-        # calculate loss
+        # calculate embedding
         embedding = model.infer(*batch)
         train_embedding = torch.cat((train_embedding, embedding), dim=0)
     assert train_embedding.shape[0] == len(train_set)
 
-    ######################################### Take care here for the target saving dir ##################################
-    print('Really take care here!!!!!! Current write dir is movie_embed')
-    assert args.data_path == 'movie/'
-
-    np.save(f'movie_embed/{args.model_type}.npy', train_embedding.cpu().numpy())
+    np.save(os.path.join(args.data_path, f'{args.model_type}.npy'), train_embedding.cpu().numpy())

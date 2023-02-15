@@ -55,16 +55,3 @@ def mrr_score(y_true, y_score):
     y_true = np.take(y_true, order)
     rr_score = y_true / (np.arange(len(y_true)) + 1)
     return np.sum(rr_score) / np.sum(y_true)
-
-
-# #### Trainable Parameter Test
-# model2 = BertModel.from_pretrained(args.model_name_or_path, config=config)
-# print('############# BERT Parameters #####################')
-# for name, param in model2.named_parameters():
-#     if param.requires_grad:
-#         print(name)
-# print('############# Test Model Parameters #####################')
-# for name, param in model.named_parameters():
-#     if param.requires_grad:
-#         print(name)
-# raise ValueError('stop')
