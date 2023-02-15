@@ -21,7 +21,7 @@ pip3 install -r requirements.txt
 ## Overview
 **Edgeformers** contain two transformer-based architecture, namely **Edgeformer-E** and **Edgeformer-N**, for edge representation learning and node representation learning respectively.
 
-<img src="Edgeformers.png" width="800px"></img>
+<img src="Edgeformers.png" width="600px"></img>
 
 ## Edge Representation Learning
 ### Data Preparation
