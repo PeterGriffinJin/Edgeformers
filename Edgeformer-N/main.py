@@ -2,14 +2,13 @@ import os
 import logging
 import argparse
 from pathlib import Path
-import torch.multiprocessing as mp
 
 from src.run import train, test, infer
 from src.utils import setuplogging, str2bool, set_seed
 
 parser = argparse.ArgumentParser(description='Study for Edge Text-Rich Networks.')
 parser.add_argument("--mode", type=str, default="train", choices=['train', 'test', 'infer'])
-parser.add_argument("--data_path", type=str, default="movie/", choices=['movie/', 'Apps/', 'children/', 'crime_book/', 'stackoverflow/'])
+parser.add_argument("--data_path", type=str, default="movie/")
 # parser.add_argument("--model_dir", type=str, default='ckpt/', choices=['ckpt/', 'ckpt-test/'])  # path to save
 parser.add_argument("--data_mode", default="text", type=str, choices=['text'])
 parser.add_argument("--pretrain_embed", type=str2bool, default=False) # use pretrain node embedding or not
