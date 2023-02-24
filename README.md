@@ -6,8 +6,8 @@ This repository contains the source code and datasets for [Edgeformers: Graph-Em
 
 - [Requirements](#Requirements)
 - [Overview](#Overview)
-- [Edge Representation Learning](#Edge-Representation-Learning)
-- [Node Representation Learning](#Node-Representation-Learning)
+- [Edge Representation Learning](#Edge-Representation-Learning-(Edgeformer-E))
+- [Node Representation Learning](#Node-Representation-Learning-(Edgeformer-N))
 - [Citations](#Citations)
 
 ## Requirements
