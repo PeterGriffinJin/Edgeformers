@@ -1,6 +1,6 @@
 # Edgeformers
 
-This repository contains the source code and datasets for [Edgeformers: Graph-Empowered Transformers for Representation Learning on Textual-Edge Networks](), published in ICLR 2023.
+This repository contains the source code and datasets for [Edgeformers: Graph-Empowered Transformers for Representation Learning on Textual-Edge Networks](https://openreview.net/pdf?id=2YQrqe4RNv), published in ICLR 2023.
 
 ## Links
 
